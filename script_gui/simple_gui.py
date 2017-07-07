@@ -2,21 +2,21 @@ import abc
 import sys
 import functools
 import logging
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 import script_gui
 from . import abs_script
 from . import gui
 from . import gui_logger
 from . import states
-
-def catch_exceptions(t, val, tb):
-    print("EXCEPTION")
-    QtWidgets.QMessageBox.critical(None,
-                                   "An exception was raised",
-                                   "Exception type: {}".format(t))
-old_hook = sys.excepthook
-sys.excepthook = catch_exceptions
+#
+# def catch_exceptions(t, val, tb):
+#     print("EXCEPTION")
+#     QtWidgets.QMessageBox.critical(None,
+#                                    "An exception was raised",
+#                                    "Exception type: {}".format(t))
+# old_hook = sys.excepthook
+# sys.excepthook = catch_exceptions
 
 class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
     abort_signal = pyqtSignal()
@@ -36,6 +36,16 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
             for arg_name, arg_value in self.script.args._required.items():
                 new_line_edit = QtWidgets.QLineEdit()
                 new_line_edit.setText(arg_value.value)
+                new_line_edit.textChanged.connect(lambda d, arg=arg_name: self._set_arg(arg, d))
+                self.arg_input[arg_name] = new_line_edit
+                self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
+
+        if len(self.script.args._optional) > 0:
+            self.formLayout.addRow((QtWidgets.QLabel("Optional Arguments:")))
+            for arg_name, arg_value in self.script.args._optional.items():
+                new_line_edit = QtWidgets.QLineEdit()
+                new_line_edit.setText(arg_value.value)
+                # new_line_edit.setValidator(QtGui.QDoubleValidator())
                 new_line_edit.textChanged.connect(lambda d, arg=arg_name: self._set_arg(arg, d))
                 self.arg_input[arg_name] = new_line_edit
                 self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
