@@ -33,7 +33,6 @@ class Arguments(collections.abc.Mapping):
     # TODO: add optional validation callback
     def add_required(self, name, default="", *args, **kwargs):
         if "validate" in kwargs:
-            # TODO CREATE VALIDATION METHOD
             validator = lambda foo: foo != "" and kwargs["validate"](foo)
         else:
             validator = lambda foo: foo != ""
@@ -45,19 +44,28 @@ class Arguments(collections.abc.Mapping):
         self._required[name] = new_arg
 
     def add_optional(self, name, default="", *args, **kwargs):
+        if "validate" in kwargs:
+            validator = lambda foo: kwargs["validate"](foo)
+        else:
+            validator = lambda foo: True
         if name in self._required or name in self._optional:
             raise KeyError("{} already being used.")
-
-        self._optional[name] = default
+        new_arg = ScriptArgument(default)
+        new_arg.set_validator(validator)
+        self._optional[name] = new_arg
 
     def __getitem__(self, key):
         if key in self._required:
             return self._required[key]
+        if key in self._optional:
+            return self._optional[key]
         raise KeyError
 
     def __setitem__(self, key, item):
         if key in self._required:
             self._required[key] = item
+        if key in self._optional:
+            self._optional[key] = item
         else:
             raise KeyError
 
