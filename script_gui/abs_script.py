@@ -1,12 +1,13 @@
 import abc
 import logging
 import threading
+from  . import args
 from PyQt5.QtCore import pyqtSignal, QObject
-
 
 
 class AbsScript(QObject):
     halted_signal = pyqtSignal()
+
 
     @property
     @abc.abstractmethod
@@ -19,9 +20,11 @@ class AbsScript(QObject):
 
     def __init__(self):
         super().__init__()
+        self.args = args.Arguments()
         self.t = threading.Thread()
         self._abort_flag = threading.Event()
         self.logger = logging.getLogger(self.__module__)
+
 
     @abc.abstractmethod
     def start(self):
@@ -37,3 +40,7 @@ class AbsScript(QObject):
 
     def announce_ended(self):
         self.halted_signal.emit()
+
+    def reset(self):
+        self._abort_flag.clear()
+
