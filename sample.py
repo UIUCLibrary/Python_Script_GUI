@@ -13,9 +13,9 @@ class MyScript(AbsScript):
     def _script(self):
         # logger = logging.getLogger(__name__)
         while not self._abort_flag.is_set():
-            print(len(self.args))
-            for k,v in self.args.items():
-                print(k ,v.value, v.valid)
+            # print(len(self.args))
+            # for k,v in self.args.items():
+            #     print(k ,v.value, v.valid)
             text_block = "ASDFasdfasdfacviewnqwerf"
             a = random.randrange(1, len(text_block))
             b = "".join(random.sample(text_block, len(text_block)))
@@ -33,9 +33,10 @@ class MyScript(AbsScript):
 
     def __init__(self):
         super().__init__()
-        self.args.add_required(name="Foo", validate=lambda user_data: user_data == "f")
+        self.args.add_required(name="Foo", default="f", validate=lambda user_data: user_data == "f")
         self.args.add_required(name="Bar", default="aaaaa")
-        self.args.add_required(name="Baz")
+        self.args.add_required(name="Baz", default="aaaa")
+        self.args.add_optional(name="Baz1")
 
 
 
