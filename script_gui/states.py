@@ -1,5 +1,6 @@
 import abc
 from script_gui import simple_gui
+from PyQt5.QtWidgets import QMessageBox
 
 
 class AbsState(metaclass=abc.ABCMeta):
@@ -33,11 +34,22 @@ class IdleState(AbsState):
         super().enter()
         self._gui.startButton.setEnabled(True)
         self._gui.stopButton.setEnabled(False)
+        for _, arg_input in self._gui.arg_input.items():
+            arg_input.setEnabled(True)
 
     def process(self):
-        self._gui.current_state = self._gui.all_states['working']
-        self._gui.current_state.enter()
-
+        if self._gui.script.args.valid:
+            self._gui.current_state = self._gui.all_states['working']
+            self._gui.current_state.enter()
+        else:
+            error = QMessageBox(self._gui)
+            error.setModal(True)
+            error.setWindowTitle("Unable to Start")
+            error.setText("Not all required arguments are correctly set.")
+            error.setIcon(QMessageBox.Warning)
+            error.setDetailedText("Invalid or missing input for {}.".format(", ".join(self._gui.script.args.missing)))
+            error.exec()
+            pass
 
     @property
     def name(self) -> str:
@@ -54,6 +66,8 @@ class WorkingState(AbsState):
         self._gui.gui_logger.info("Starting process")
         self._gui.startButton.setEnabled(False)
         self._gui.stopButton.setEnabled(True)
+        for _, arg_input in self._gui.arg_input.items():
+            arg_input.setEnabled(False)
         self._gui._execute()
 
     def process(self):
