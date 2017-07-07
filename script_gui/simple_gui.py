@@ -9,6 +9,8 @@ from . import abs_script
 from . import gui
 from . import gui_logger
 from . import states
+
+
 #
 # def catch_exceptions(t, val, tb):
 #     print("EXCEPTION")
@@ -17,7 +19,6 @@ from . import states
 #                                    "Exception type: {}".format(t))
 # old_hook = sys.excepthook
 # sys.excepthook = catch_exceptions
-
 class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
     abort_signal = pyqtSignal()
 
@@ -34,19 +35,29 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         if len(self.script.args._required) > 0:
             self.formLayout.addRow((QtWidgets.QLabel("Required Arguments:")))
             for arg_name, arg_value in self.script.args._required.items():
-                new_line_edit = QtWidgets.QLineEdit()
+                new_line_edit = QtWidgets.QLineEdit(self)
+                new_label = QtWidgets.QLabel(arg_name)
+
                 new_line_edit.setText(arg_value.value)
-                new_line_edit.textChanged.connect(lambda d, arg=arg_name: self._set_arg(arg, d))
+                new_line_edit.textChanged.connect(
+                    lambda d, arg=arg_name, sender=new_line_edit: self._set_arg(arg, d, sender))
+
+                if arg_value.help:
+                    new_label.setToolTip(arg_value.help)
+                    new_line_edit.setToolTip(arg_value.help)
+
                 self.arg_input[arg_name] = new_line_edit
-                self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
+
+
+                self.formLayout.addRow((new_label), new_line_edit)
 
         if len(self.script.args._optional) > 0:
             self.formLayout.addRow((QtWidgets.QLabel("Optional Arguments:")))
             for arg_name, arg_value in self.script.args._optional.items():
-                new_line_edit = QtWidgets.QLineEdit()
+                new_line_edit = QtWidgets.QLineEdit(self)
                 new_line_edit.setText(arg_value.value)
-                # new_line_edit.setValidator(QtGui.QDoubleValidator())
-                new_line_edit.textChanged.connect(lambda d, arg=arg_name: self._set_arg(arg, d))
+                new_line_edit.textEdited.connect(
+                    lambda d, arg=arg_name, sender=new_line_edit: self._set_arg(arg, d, sender))
                 self.arg_input[arg_name] = new_line_edit
                 self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
 
@@ -90,5 +101,11 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
     def _execute(self):
         self.script.start()
 
-    def _set_arg(self, name, value):
-        self.script.args[name].value = value
+    def _set_arg(self, name, value, sender):
+        arg = self.script.args[name]
+        arg.value = value
+        if arg.valid:
+            color = "#c4df9b"  # Green
+        else:
+            color = "#f6989d"  # Red
+        sender.setStyleSheet("QLineEdit {{ background-color: {} }}".format(color))
