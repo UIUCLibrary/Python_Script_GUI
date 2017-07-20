@@ -1,7 +1,7 @@
 import abc
 from script_gui import simple_gui
 from PyQt5.QtWidgets import QMessageBox
-
+from .script_signals import SignalTypes
 
 class AbsState(metaclass=abc.ABCMeta):
     def __init__(self, context: "simple_gui.SimpleGui"):
@@ -24,6 +24,17 @@ class AbsState(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def name(self) -> str:
         pass
+
+    def status_update(self, status, message):
+        if isinstance(message, str) and message.strip() == "":
+            details = None
+        else:
+            details = message
+        self.confirm_finished()
+        if status == SignalTypes.SUCCESS:
+            self._gui.announce_success(details)
+        elif status == SignalTypes.FAILED:
+            self._gui.announce_failure(details)
 
     def confirm_finished(self):
         pass
@@ -83,7 +94,11 @@ class WorkingState(AbsState):
         self._gui.current_state.enter()
 
     def confirm_finished(self):
-        pass
+
+        self._gui.gui_logger.info("Job finished")
+        self._gui.current_state = self._gui.all_states['idle']
+        self._gui.script.reset()
+        self._gui.current_state.enter()
 
 
 class HaltingState(AbsState):
