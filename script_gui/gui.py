@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.8.2
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,6 +12,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(849, 719)
+        MainWindow.setMinimumSize(QtCore.QSize(640, 480))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -38,9 +39,6 @@ class Ui_MainWindow(object):
         self.formLayout = QtWidgets.QFormLayout(self.argumentsFrame)
         self.formLayout.setObjectName("formLayout")
         self.verticalLayout.addWidget(self.argumentsFrame)
-        self.textBrowser = QtWidgets.QTextBrowser(self.frame)
-        self.textBrowser.setObjectName("textBrowser")
-        self.verticalLayout.addWidget(self.textBrowser)
         self.actionsFrame = QtWidgets.QFrame(self.frame)
         self.actionsFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.actionsFrame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -54,17 +52,31 @@ class Ui_MainWindow(object):
         self.stopButton.setObjectName("stopButton")
         self.horizontalLayout.addWidget(self.stopButton)
         self.verticalLayout.addWidget(self.actionsFrame)
+        self.textBrowser = QtWidgets.QTextBrowser(self.frame)
+        self.textBrowser.setObjectName("textBrowser")
+        self.verticalLayout.addWidget(self.textBrowser)
         self.verticalLayout_2.addWidget(self.frame)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 849, 21))
         self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionSave_Console_Log = QtWidgets.QAction(MainWindow)
+        self.actionSave_Console_Log.setObjectName("actionSave_Console_Log")
+        self.actionQuit = QtWidgets.QAction(MainWindow)
+        self.actionQuit.setObjectName("actionQuit")
+        self.menuFile.addAction(self.actionSave_Console_Log)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionQuit)
+        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.actionQuit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -72,4 +84,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.startButton.setText(_translate("MainWindow", "Start"))
         self.stopButton.setText(_translate("MainWindow", "Stop"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.actionSave_Console_Log.setText(_translate("MainWindow", "Save Console Log"))
+        self.actionQuit.setText(_translate("MainWindow", "Quit"))
 
