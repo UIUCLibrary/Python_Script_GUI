@@ -19,17 +19,30 @@ from . import states
 #                                    "Exception type: {}".format(t))
 # old_hook = sys.excepthook
 # sys.excepthook = catch_exceptions
+
+def get_max_line_width(text):
+    max_len = 0
+    for line in text.split("\n"):
+        if len(line) > max_len:
+            max_len = len(line)
+
+    return max_len
+
+
 class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
     abort_signal = pyqtSignal()
 
     def __init__(self, script: abs_script.AbsScript):
         self.app = QtWidgets.QApplication(sys.argv)
         super().__init__()
+
         self.statusBar = QtWidgets.QStatusBar()
         self.script = script
         self.abort_signal.connect(self.script.abort)
-        self.script.halted_signal.connect(lambda: self.current_state.confirm_finished())
+
+        self.script.change_signal.connect(lambda status, message: self.current_state.status_update(status, message))
         self.setupUi(self)
+        self.actionSave_Console_Log.triggered.connect(self.save_console_to_file)
         self.arg_input = dict()
 
         if len(self.script.args._required) > 0:
@@ -47,7 +60,6 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
                     new_line_edit.setToolTip(arg_value.help)
 
                 self.arg_input[arg_name] = new_line_edit
-
 
                 self.formLayout.addRow((new_label), new_line_edit)
 
@@ -67,6 +79,7 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         self.gui_logger = logging.getLogger(__name__)
         self.gui_logger.setLevel(logging.INFO)
         self.setStatusBar(self.statusBar)
+        self.textBrowser.setFont(QtGui.QFontDatabase.systemFont(QtGui.QFontDatabase.FixedFont))
         self.statusBar.showMessage("{} started".format(self.script.title))
         self.all_states = {
             "idle": states.IdleState(self),
@@ -76,6 +89,33 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
 
         self.current_state = self.all_states["idle"]
         self.current_state.enter()
+
+    def announce_success(self, details=None):
+        message = QtWidgets.QMessageBox(self)
+        message.setModal(True)
+        message.setWindowTitle("Process finished")
+        message.setIcon(QtWidgets.QMessageBox.Information)
+
+        if details is not None:
+            details_width = get_max_line_width(details)
+            margin = 40
+            message.setText(
+                "Job finished successfully.\nFor more information click the details button below.\n{}".format(
+                    " " * (details_width + margin)))
+            message.setDetailedText(details)
+        else:
+            message.setText("Job finished successfully.")
+        message.exec()
+
+    def announce_failure(self, details=None):
+        error = QtWidgets.QMessageBox(self)
+        error.setModal(True)
+        error.setWindowTitle("Process stopped")
+        error.setText("Script stopped prematurely")
+        error.setIcon(QtWidgets.QMessageBox.Warning)
+        if details is not None:
+            error.setDetailedText(details)
+        error.exec()
 
     def load_logger(self, debug=False):
         qt_logger = gui_logger.QtLogger(self.textBrowser)
@@ -97,6 +137,19 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
     def abort(self):
         self.gui_logger.debug("Abort processing requested by user")
         self.current_state.abort()
+
+    def save_console_to_file(self):
+        self.gui_logger.debug("Opening Save file dialog box")
+        save_dialog_box = QtWidgets.QFileDialog()
+        filename, _ = save_dialog_box.getSaveFileName(self, filter="Text Files (*.txt);;All Files (*)")
+        if filename:
+            try:
+                self.gui_logger.debug("Save Console output as {}".format(filename))
+                with open(filename, "w", encoding="utf8") as writer:
+                    writer.write(self.textBrowser.toPlainText())
+                self.gui_logger.info("Console output saved to {}".format(filename))
+            except IOError as e:
+                self.gui_logger.error(e)
 
     def _execute(self):
         self.script.start()
