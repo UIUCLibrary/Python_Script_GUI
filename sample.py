@@ -4,25 +4,26 @@ import threading
 from time import sleep
 
 from script_gui import SimpleGui, AbsScript
-
-
-# import script_gui
+from script_gui.script_signals import SignalTypes
 
 
 class MyScript(AbsScript):
     def _script(self):
         # logger = logging.getLogger(__name__)
-        while not self._abort_flag.is_set():
-            # print(len(self.args))
-            # for k,v in self.args.items():
-            #     print(k ,v.value, v.valid)
+        keep_going = True
+        while keep_going:
+            if self._abort_flag.is_set():
+                self.announce(SignalTypes.FAILED)
+                break
+        # while not self._abort_flag.is_set():
             text_block = "ASDFasdfasdfacviewnqwerf"
             a = random.randrange(1, len(text_block))
             b = "".join(random.sample(text_block, len(text_block)))
-            # logger.info("Sample message: Random text \"{}\"".format(b[0:a]))
             self.logger.info("Sample message: Random text \"{}\"".format(b[0:a]))
-            sleep(.5)
-        self.announce_ended()
+            # sleep(.5)
+            keep_going = False
+        else:
+            self.announce(SignalTypes.SUCCESS)
 
     def run(self):
         self._script()
@@ -33,12 +34,11 @@ class MyScript(AbsScript):
 
     def __init__(self):
         super().__init__()
-        self.args.add_required(name="Foo", default="f", validate=lambda user_data: user_data == "f")
+        self.args.add_required(name="Foo", default="f", validate=lambda user_data: user_data == "f",
+                               help="Must be the letter f")
         self.args.add_required(name="Bar", default="aaaaa")
         self.args.add_required(name="Baz", default="aaaa")
         self.args.add_optional(name="Baz1")
-
-
 
     @property
     def title(self) -> str:
