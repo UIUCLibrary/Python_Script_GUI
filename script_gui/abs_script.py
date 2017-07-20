@@ -1,13 +1,15 @@
 import abc
 import logging
+import warnings
 import threading
-from  . import args
+from . import script_args
 from PyQt5.QtCore import pyqtSignal, QObject
+from .script_signals import SignalTypes
 
 
 class AbsScript(QObject):
-    halted_signal = pyqtSignal()
-
+    _halted_signal = pyqtSignal()
+    change_signal = pyqtSignal(SignalTypes, str)
 
     @property
     @abc.abstractmethod
@@ -18,13 +20,15 @@ class AbsScript(QObject):
     def run(self):
         pass
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
-        self.args = args.Arguments()
+        self.args = script_args.Arguments()
         self.t = threading.Thread()
         self._abort_flag = threading.Event()
-        self.logger = logging.getLogger(self.__module__)
-
+        if "logger" in kwargs:
+            self.logger = logging.getLogger(kwargs["logger"])
+        else:
+            self.logger = logging.getLogger(self.__module__)
 
     @abc.abstractmethod
     def start(self):
@@ -39,8 +43,16 @@ class AbsScript(QObject):
         return self.t.is_alive()
 
     def announce_ended(self):
+        warnings.warn("Use announce instead", DeprecationWarning)
         self.halted_signal.emit()
+
+    def announce(self, signal: SignalTypes, message=None):
+        self.change_signal.emit(signal, message)
 
     def reset(self):
         self._abort_flag.clear()
 
+    @property
+    def halted_signal(self):
+        warnings.warn("Use change_signal instead", DeprecationWarning)
+        return self._halted_signal
