@@ -1,0 +1,6 @@
+__title__ = 'script_gui'
+__version__ = '0.0.1'
+__url__ = ''
+__author__ = 'University of Illinois at Urbana Champaign'
+__author_email__ = 'hborcher@illinois.edu'
+__description__ = 'Simple framework for making baseline graphical user interfaces for commandline scripts'
