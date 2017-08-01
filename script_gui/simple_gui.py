@@ -46,8 +46,11 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         self.arg_input = dict()
 
         if len(self.script.args._required) > 0:
-            self.formLayout.addRow((QtWidgets.QLabel("Required Arguments:")))
-            for arg_name, arg_value in self.script.args._required.items():
+
+            self.gridLayout.addWidget(QtWidgets.QLabel("Required Arguments:"), 0, 0, 1, 2)
+            # self.formLayout.addRow((QtWidgets.QLabel("Required Arguments:")))
+            start = 1
+            for row, (arg_name, arg_value) in enumerate(self.script.args._required.items()):
                 new_line_edit = QtWidgets.QLineEdit(self)
                 new_label = QtWidgets.QLabel(arg_name)
 
@@ -60,18 +63,22 @@ class SimpleGui(QtWidgets.QMainWindow, gui.Ui_MainWindow):
                     new_line_edit.setToolTip(arg_value.help)
 
                 self.arg_input[arg_name] = new_line_edit
-
-                self.formLayout.addRow((new_label), new_line_edit)
+                self.gridLayout.addWidget(new_label, row + start, 0)
+                self.gridLayout.addWidget(new_line_edit, row + start, 1)
+                # self.formLayout.addRow((new_label), new_line_edit)
 
         if len(self.script.args._optional) > 0:
-            self.formLayout.addRow((QtWidgets.QLabel("Optional Arguments:")))
-            for arg_name, arg_value in self.script.args._optional.items():
+            start = len(self.script.args._required) + 2
+            self.gridLayout.addWidget(QtWidgets.QLabel("Optional Arguments:"), len(self.script.args._required) + 1, 0, 1, 2)
+            for row, (arg_name, arg_value) in enumerate(self.script.args._optional.items()):
                 new_line_edit = QtWidgets.QLineEdit(self)
                 new_line_edit.setText(arg_value.value)
                 new_line_edit.textEdited.connect(
                     lambda d, arg=arg_name, sender=new_line_edit: self._set_arg(arg, d, sender))
                 self.arg_input[arg_name] = new_line_edit
-                self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
+                self.gridLayout.addWidget(QtWidgets.QLabel(arg_name), row + start, 0)
+                self.gridLayout.addWidget(new_line_edit, row + start, 1)
+                # self.formLayout.addRow((QtWidgets.QLabel(arg_name)), new_line_edit)
 
         self.startButton.clicked.connect(self.process)
         self.stopButton.clicked.connect(self.abort)
