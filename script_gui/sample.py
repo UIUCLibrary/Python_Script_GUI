@@ -15,7 +15,7 @@ class MyScript(AbsScript):
             if self._abort_flag.is_set():
                 self.announce(SignalTypes.FAILED)
                 break
-        # while not self._abort_flag.is_set():
+                # while not self._abort_flag.is_set():
             text_block = "ASDFasdfasdfacviewnqwerf"
             a = random.randrange(1, len(text_block))
             b = "".join(random.sample(text_block, len(text_block)))
