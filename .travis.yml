@@ -3,7 +3,7 @@ python:
 - '3.5'
 - '3.6'
 install:
-- python install PyQt5
+- pip install PyQt5
 - python setup.py install
 script:
 - pip list
