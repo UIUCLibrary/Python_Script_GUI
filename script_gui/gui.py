@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'gui.ui'
+# Form implementation generated from reading ui file 'script_gui/gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.9
 #
@@ -36,8 +36,8 @@ class Ui_MainWindow(object):
         self.argumentsFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.argumentsFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.argumentsFrame.setObjectName("argumentsFrame")
-        self.formLayout = QtWidgets.QFormLayout(self.argumentsFrame)
-        self.formLayout.setObjectName("formLayout")
+        self.gridLayout = QtWidgets.QGridLayout(self.argumentsFrame)
+        self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout.addWidget(self.argumentsFrame)
         self.actionsFrame = QtWidgets.QFrame(self.frame)
         self.actionsFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.frame)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 849, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 849, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
