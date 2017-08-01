@@ -1,5 +1,4 @@
 from setuptools import setup
-import script_gui
 import os
 
 
