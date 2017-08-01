@@ -4,3 +4,7 @@ __url__ = ''
 __author__ = 'University of Illinois at Urbana Champaign'
 __author_email__ = 'hborcher@illinois.edu'
 __description__ = 'Simple framework for making baseline graphical user interfaces for commandline scripts'
+maintainer = "Henry Borchers"
+maintainer_email = "hborcher@illinois.edu"
+download_url = "https://github.com/UIUCLibrary/sccm_deploy_message_generator"
+license_ = "University of Illinois/NCSA Open Source License"
