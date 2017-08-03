@@ -2,6 +2,9 @@ import collections.abc
 import collections
 
 import itertools
+import abc
+import typing
+import warnings
 
 
 class ScriptArgument:
@@ -24,8 +27,48 @@ class ScriptArgument:
         return self._validation(value)
 
 
+class AbsArgumentBuilder(metaclass=abc.ABCMeta):
+    def __init__(self) -> None:
+        self._args = dict()
+
+    @abc.abstractmethod
+    def add_argument(self, name: str, default="", *args, **kwargs) -> None:
+        pass
+
+    @abc.abstractmethod
+    def build(self) -> typing.Dict[str, ScriptArgument]:
+        pass
+
+
+class ArgumentBuilder(AbsArgumentBuilder):
+
+    @staticmethod
+    def default_validator(data: str)->bool:
+        return True
+
+    def add_argument(self, name: str, default="", *args, **kwargs) -> None:
+        if name in self._args:
+            raise KeyError("{} already being used.")
+
+        new_arg = ScriptArgument(default)
+
+        if "validate" in kwargs:
+            new_arg.set_validator(kwargs["validate"])
+        else:
+            new_arg.set_validator(self.default_validator)
+
+        if "help" in kwargs:
+            new_arg.help = kwargs['help']
+
+        self._args[name] = new_arg
+
+    def build(self) -> typing.Dict[str, ScriptArgument]:
+        return self._args
+
+
 class Arguments(collections.abc.Mapping):
     def __init__(self, *args, **kwargs):
+        warnings.warn("Use ScriptArgument() instead", DeprecationWarning)
         self._required = dict()
         self._optional = dict()
 
