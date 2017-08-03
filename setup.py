@@ -31,6 +31,9 @@ setup(
     download_url=metadata["download_url"],
     packages=["script_gui"],
     install_requires=["PyQt5"],
-    long_description=readme
+    long_description=readme,
+    test_suite="tests",
+    tests_require=["pytest"],
+    setup_requires=['pytest-runner'],
 
 )
