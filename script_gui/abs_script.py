@@ -2,9 +2,67 @@ import abc
 import logging
 import warnings
 import threading
+import typing
+
+from script_gui.script_args import ArgumentBuilder
+from script_gui.script_runners import abs_script_runner
 from . import script_args
 from PyQt5.QtCore import pyqtSignal, QObject
 from .script_signals import SignalTypes
+
+
+class AbsScript2(metaclass=abc.ABCMeta):
+    title = "Python Script"
+
+    def __init__(self):
+        self.args = {
+            "required": self._build_args(self.required_arguments),
+            "optional": self._build_args(self.optional_arguments)
+        }
+        self.logger = logging.getLogger(self.__class__.__module__)
+        self.logger.setLevel(logging.INFO)
+        self._abort_flag = threading.Event()
+        self._signal_caller = abs_script_runner.NoSignals()
+        self.setup()
+
+    def setup(self):
+        pass
+
+    @property
+    def required_arguments(self) -> typing.List[dict]:
+        return []
+
+    @property
+    def optional_arguments(self) -> typing.List[dict]:
+        return []
+
+    @staticmethod
+    def _build_args(arg_list):
+        builder = ArgumentBuilder()
+        for arg in arg_list:
+            builder.add_argument(**arg)
+        return builder.build()
+
+    @abc.abstractmethod
+    def run(self):
+        pass
+
+    def valid(self):
+        return True
+
+    def set_logger(self, logger):
+        self.logger = logger
+        pass
+
+    def set_abort_flag(self, value):
+        self._abort_flag = value
+
+    def set_signal_caller(self, value):
+        self._signal_caller = value
+
+    def announce(self, signal: SignalTypes, message=None):
+        self._signal_caller.CHANGE.emit(signal, message)
+
 
 
 class AbsScript(QObject):
@@ -22,6 +80,7 @@ class AbsScript(QObject):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
+        warnings.warn("Use AbsScript2 instead", DeprecationWarning)
         self.args = script_args.Arguments()
         self.t = threading.Thread()
         self._abort_flag = threading.Event()
