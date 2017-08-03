@@ -1,10 +1,12 @@
 import abc
+import warnings
 from script_gui import simple_gui
 from PyQt5.QtWidgets import QMessageBox
 from .script_signals import SignalTypes
 
 class AbsState(metaclass=abc.ABCMeta):
     def __init__(self, context: "simple_gui.SimpleGui"):
+        warnings.warn("Use states2.py instead", DeprecationWarning)
         self._gui = context
 
     @abc.abstractmethod
