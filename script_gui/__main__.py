@@ -1,9 +1,9 @@
-from script_gui import sample
+from script_gui import sample2
 import sys
 
 def main():
     if "--sample" in sys.argv:
-        sample.main()
+        sample2.main()
 
 
 if __name__ == '__main__':
