@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from script_gui.script_runners import abs_script_runner
+# from script_gui import abs_script
 import logging
 import PyQt5
 
@@ -12,7 +13,7 @@ class QTSignals(QObject):
     CHANGE = pyqtSignal(SignalTypes, str)
 
 
-class QtScriptRunner(abs_script_runner.ScriptRunner):
+class QtScriptRunner(abs_script_runner.absScriptRunner):
     signals = QTSignals()
 
     def __init__(self, script: "AbsScript2"):
