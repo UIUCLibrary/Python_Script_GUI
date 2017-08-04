@@ -179,7 +179,6 @@ def get_max_line_width(text):
 
 
 class SimpleGui2(QtWidgets.QMainWindow, gui.Ui_MainWindow):
-    abort_signal = pyqtSignal()
 
     def __init__(self, script):
         self.app = QtWidgets.QApplication(sys.argv)
@@ -198,8 +197,6 @@ class SimpleGui2(QtWidgets.QMainWindow, gui.Ui_MainWindow):
 
         # Wire up the signals
         self.actionSave_Console_Log.triggered.connect(self.save_console_to_file)
-        self.abort_signal.connect(self.script_runner.abort)
-
         self.script_runner.signals.CHANGE.connect(
             lambda status, message: self.current_state.status_update(status, message))
         self.startButton.clicked.connect(self.process)
@@ -324,7 +321,11 @@ class SimpleGui2(QtWidgets.QMainWindow, gui.Ui_MainWindow):
 
     def abort(self):
         self.gui_logger.debug("Abort processing requested by user")
-        self.current_state.abort()
+        try:
+            self.current_state.abort()
+        except Exception as e:
+            print(e)
+            raise
 
     def save_console_to_file(self):
         self.gui_logger.debug("Opening Save file dialog box")
