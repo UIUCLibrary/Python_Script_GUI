@@ -34,8 +34,8 @@ class QtLogger(logging.Handler):
         # keep text scrolled at the bottom as it updates if it's already at the bottom
         diff = sb.maximum() - sb.value()
         if diff < STICKY_THRESHOLD:
-            sb.setValue(sb.maximum())
             self.widget.ensureCursorVisible()
+            sb.setValue(sb.maximum())
             # curser = self.widget.textCursor()
             # assert isinstance(curser, QtGui.QTextCursor)
             # curser.setPosition(end)
