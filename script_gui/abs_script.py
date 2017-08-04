@@ -59,9 +59,15 @@ class AbsScript2(metaclass=abc.ABCMeta):
 
     def set_signal_caller(self, value):
         self._signal_caller = value
+        # print(self._signal_caller)
 
     def announce(self, signal: SignalTypes, message=None):
-        self._signal_caller.CHANGE.emit(signal, message)
+        try:
+            # self.signals.CHANGE.emit(signal, message)
+            self._signal_caller.CHANGE.emit(signal, message)
+        except Exception as e:
+            print(e)
+            raise
 
 
 
