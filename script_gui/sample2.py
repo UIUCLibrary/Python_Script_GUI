@@ -8,7 +8,7 @@ import sys
 
 from script_gui.abs_script import AbsScript2
 from script_gui.script_runners import cli_runner, gui_runner
-from script_gui.script_runners.abs_script_runner import ScriptRunner
+from script_gui.script_runners.abs_script_runner import absScriptRunner
 from script_gui.simple_gui import SimpleGui2
 from script_gui.script_signals import SignalTypes
 
@@ -21,7 +21,6 @@ class MyScript(AbsScript2):
         self.logger.info("HERE we go")
         keep_going = True
         while keep_going:
-
             if self._abort_flag.is_set():
                 self.announce(SignalTypes.FAILED)
                 break
@@ -31,9 +30,8 @@ class MyScript(AbsScript2):
             b = "".join(random.sample(text_block, len(text_block)))
             self.logger.info("Sample message: Random text \"{}\"".format(b[0:a]))
             sleep(.5)
-            # keep_going = False
+            keep_going = False
         else:
-            pass
             self.announce(SignalTypes.SUCCESS)
 
     @property
