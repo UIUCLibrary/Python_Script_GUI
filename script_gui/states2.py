@@ -26,15 +26,21 @@ class AbsState(metaclass=abc.ABCMeta):
         pass
 
     def status_update(self, status, message):
+
         if isinstance(message, str) and message.strip() == "":
             details = None
         else:
             details = message
-        self.confirm_finished()
+
+
         if status == SignalTypes.SUCCESS:
+            self._gui.script_runner.change_state("completed")
+
             self._gui.announce_success(details)
         elif status == SignalTypes.FAILED:
+            self._gui.script_runner.change_state("failed")
             self._gui.announce_failure(details)
+        self.confirm_finished()
 
     def confirm_finished(self):
         pass
@@ -94,10 +100,17 @@ class WorkingState(AbsState):
         self._gui.current_state.enter()
 
     def confirm_finished(self):
-
+        finished_states = ["completed", "failed"]
         self._gui.gui_logger.info("Job finished")
         self._gui.current_state = self._gui.all_states['idle']
-        self._gui.script_runner.reset()
+        if self._gui.script_runner.current_state.name in finished_states:
+            self._gui.script_runner.reset()
+        # print("HERE")
+        # print(self._gui.script_runner.current_state)
+        # try:
+        #     self._gui.script_runner.reset()
+        # except Exception as e:
+        #     print(e)
         self._gui.current_state.enter()
 
 
@@ -106,7 +119,9 @@ class HaltingState(AbsState):
     def enter(self):
         super().enter()
         self._gui.stopButton.setEnabled(False)
-        self._gui.abort_signal.emit()
+        self._gui.script_runner.change_state("halting")
+        #  TODO FIX about signal.  should be sent to the runner
+        # self._gui.abort_signal.emit()
 
     def process(self):
         self._gui.gui_logger.error("Unable to start a new process until current one has stopped")
