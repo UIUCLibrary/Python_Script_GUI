@@ -15,17 +15,15 @@ class NoScript(AbsScript2):
 
     def run(self):
         # todo:  change to run until break
-        print("running a GUI script")
-        sleep(2)
-        print("Done with script")
+        sleep(1)
 
 
 def test_is_abstract():
-    class DummyScript(abs_script_runner.ScriptRunner):
+    class DummyAbsScript(abs_script_runner.absScriptRunner):
         pass
 
     with pytest.raises(TypeError):
-        DummyScript(NoScript())
+        DummyAbsScript(NoScript())
 
 
 class TestQtScript:
@@ -39,10 +37,10 @@ class TestQtScript:
     def test_signals(self, script_fixture: gui_runner.QtScriptRunner):
         assert isinstance(script_fixture.signals, gui_runner.QTSignals)
 
-    def test_title(self, script_fixture: cli_runner.CLIScriptRunner):
+    def test_title(self, script_fixture: gui_runner.QtScriptRunner):
         assert script_fixture.title == "No script"
 
-    def test_start_daemon(self, script_fixture: cli_runner.CLIScriptRunner):
+    def test_start_daemon(self, script_fixture: gui_runner.QtScriptRunner):
         # FIXME: Very flakey test because it's currently running a thread on a timer.
         script_fixture.start(daemon=True)
         was_running = False
