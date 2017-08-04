@@ -29,7 +29,10 @@ setup(
     maintainer_email=metadata["maintainer_email"],
     description=metadata["__description__"],
     download_url=metadata["download_url"],
-    packages=["script_gui"],
+    packages=[
+        "script_gui",
+        "script_gui.script_runners",
+    ],
     install_requires=["PyQt5"],
     long_description=readme,
     test_suite="tests",
